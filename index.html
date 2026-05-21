@@ -1,0 +1,306 @@
+<import React, { useMemo, useState } from 'react';
+import { ShoppingBag, MessageCircle, ShieldCheck, Truck, MapPin, Smartphone, Headphones, Watch, Laptop, Search, Star, CheckCircle2, ChevronRight, X, Plus, Minus } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const WHATSAPP_NUMBER = '355692100222';
+
+const products = [
+  { id: 1, name: 'iPhone 17 Pro Max', category: 'iPhone', badge: 'Europe CE', storage: '256GB / 512GB / 1TB', price: 'Price on request', desc: 'Original Apple device with Apple warranty verification.', featured: true },
+  { id: 2, name: 'iPhone 17 Pro', category: 'iPhone', badge: 'New arrival', storage: '256GB / 512GB / 1TB', price: 'Price on request', desc: 'Premium titanium finish, sealed and ready to reserve.', featured: true },
+  { id: 3, name: 'iPhone 16 Pro Max', category: 'iPhone', badge: 'Best seller', storage: '256GB / 512GB', price: 'Price on request', desc: 'High demand model, availability confirmed on WhatsApp.', featured: true },
+  { id: 4, name: 'iPhone 15 Pro', category: 'iPhone', badge: 'Verified stock', storage: '128GB / 256GB', price: 'Price on request', desc: 'Original Apple, Europe CE version.', featured: false },
+  { id: 5, name: 'AirPods Pro', category: 'AirPods', badge: 'Original', storage: 'USB-C Case', price: 'Price on request', desc: 'Premium sound, sealed box, availability via WhatsApp.', featured: true },
+  { id: 6, name: 'AirPods Max', category: 'AirPods', badge: 'Premium audio', storage: 'Multiple colors', price: 'Price on request', desc: 'Over-ear Apple audio experience.', featured: false },
+  { id: 7, name: 'Apple Watch Ultra', category: 'Watch', badge: 'Performance', storage: 'GPS + Cellular', price: 'Price on request', desc: 'Built for sport, movement and everyday performance.', featured: true },
+  { id: 8, name: 'Apple Watch Series', category: 'Watch', badge: 'New', storage: '41mm / 45mm', price: 'Price on request', desc: 'Original Apple Watch models available on request.', featured: false },
+  { id: 9, name: 'MacBook Air', category: 'Mac', badge: 'Apple silicon', storage: 'M-series chip', price: 'Price on request', desc: 'Light, fast and perfect for study, work and business.', featured: true },
+  { id: 10, name: 'MacBook Pro', category: 'Mac', badge: 'Pro power', storage: 'M-series chip', price: 'Price on request', desc: 'Professional Apple performance, stock confirmed via WhatsApp.', featured: false },
+  { id: 11, name: 'Accessories', category: 'Accessories', badge: 'Essential', storage: 'Cases / chargers / cables', price: 'Price on request', desc: 'Original and premium compatible accessories.', featured: false },
+  { id: 12, name: 'MagSafe Collection', category: 'Accessories', badge: 'Popular', storage: 'Chargers / cases', price: 'Price on request', desc: 'Smart accessories for iPhone daily use.', featured: false }
+];
+
+const categories = [
+  { name: 'All', icon: Smartphone },
+  { name: 'iPhone', icon: Smartphone },
+  { name: 'AirPods', icon: Headphones },
+  { name: 'Watch', icon: Watch },
+  { name: 'Mac', icon: Laptop },
+  { name: 'Accessories', icon: ShoppingBag }
+];
+
+function waLink(productName = '') {
+  const message = productName
+    ? `Hello Molla Shop, I want to check availability and price for ${productName}.`
+    : 'Hello Molla Shop, I want to check availability for Apple products.';
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+}
+
+function ProductCard({ product, onAdd }) {
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="group rounded-[2rem] border border-white/10 bg-white/[0.04] p-4 shadow-2xl shadow-black/20 backdrop-blur"
+    >
+      <div className="relative mb-5 flex aspect-[4/3] items-center justify-center overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-zinc-800 via-zinc-950 to-black">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.18),transparent_35%)]" />
+        <div className="relative flex h-36 w-24 items-center justify-center rounded-[2rem] border border-white/20 bg-zinc-950 shadow-2xl shadow-white/10 transition group-hover:scale-105">
+          <div className="h-28 w-20 rounded-[1.5rem] bg-gradient-to-br from-zinc-700 to-zinc-950" />
+        </div>
+        <span className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-medium text-black">{product.badge}</span>
+      </div>
+      <div className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">{product.category}</p>
+            <h3 className="mt-1 text-xl font-semibold text-white">{product.name}</h3>
+          </div>
+          {product.featured && <Star className="h-5 w-5 fill-white text-white" />}
+        </div>
+        <p className="text-sm text-zinc-400">{product.desc}</p>
+        <p className="text-sm text-zinc-300">{product.storage}</p>
+        <div className="flex items-center justify-between pt-2">
+          <span className="text-sm font-semibold text-white">{product.price}</span>
+          <button onClick={() => onAdd(product)} className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition hover:scale-105">Add</button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+export default function MollaShopPremiumEcommerce() {
+  const [active, setActive] = useState('All');
+  const [search, setSearch] = useState('');
+  const [cart, setCart] = useState([]);
+  const [openCart, setOpenCart] = useState(false);
+
+  const filtered = useMemo(() => {
+    return products.filter(p => {
+      const byCategory = active === 'All' || p.category === active;
+      const bySearch = `${p.name} ${p.category} ${p.desc}`.toLowerCase().includes(search.toLowerCase());
+      return byCategory && bySearch;
+    });
+  }, [active, search]);
+
+  const addToCart = product => {
+    setCart(prev => {
+      const existing = prev.find(i => i.id === product.id);
+      if (existing) return prev.map(i => i.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+      return [...prev, { ...product, qty: 1 }];
+    });
+    setOpenCart(true);
+  };
+
+  const changeQty = (id, delta) => {
+    setCart(prev => prev.map(i => i.id === id ? { ...i, qty: Math.max(1, i.qty + delta) } : i));
+  };
+
+  const removeItem = id => setCart(prev => prev.filter(i => i.id !== id));
+
+  const cartMessage = cart.length
+    ? `Hello Molla Shop, I want to check availability and price for: ${cart.map(i => `${i.qty}x ${i.name}`).join(', ')}.`
+    : 'Hello Molla Shop, I want to check availability for Apple products.';
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <header className="sticky top-0 z-40 border-b border-white/10 bg-black/70 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+          <a href="#home" className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-xl font-bold text-black"></div>
+            <div>
+              <p className="text-lg font-semibold tracking-tight">Molla Shop</p>
+              <p className="text-xs text-zinc-500">Original Apple · Europe CE</p>
+            </div>
+          </a>
+          <nav className="hidden items-center gap-7 text-sm text-zinc-300 md:flex">
+            <a href="#shop" className="hover:text-white">Shop</a>
+            <a href="#trust" className="hover:text-white">Why Molla</a>
+            <a href="#visit" className="hover:text-white">Store</a>
+            <a href="#faq" className="hover:text-white">FAQ</a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <a href={waLink()} className="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white hover:bg-white hover:text-black md:inline-flex">WhatsApp</a>
+            <button onClick={() => setOpenCart(true)} className="relative rounded-full bg-white px-4 py-2 text-sm font-semibold text-black">
+              Bag {cart.reduce((s, i) => s + i.qty, 0)}
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <section id="home" className="relative overflow-hidden px-5 py-20 md:py-28">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,.16),transparent_35%)]" />
+        <div className="relative mx-auto grid max-w-7xl items-center gap-12 md:grid-cols-[1.05fr_.95fr]">
+          <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <p className="mb-5 inline-flex rounded-full border border-white/15 px-4 py-2 text-sm text-zinc-300">iPhone Original Nga Apple · Europa CE · 1 Year Warranty</p>
+            <h1 className="max-w-4xl text-5xl font-semibold tracking-tight md:text-7xl">Original Apple devices. Premium service in Elbasan.</h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-400">A clean, fast and Instagram-native ecommerce experience for iPhone, AirPods, Apple Watch, Mac and accessories. Check real availability, reserve on WhatsApp and visit the store.</p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href="#shop" className="inline-flex items-center justify-center rounded-full bg-white px-6 py-4 font-semibold text-black transition hover:scale-105">Shop products <ChevronRight className="ml-2 h-4 w-4" /></a>
+              <a href={waLink()} className="inline-flex items-center justify-center rounded-full border border-white/15 px-6 py-4 font-semibold text-white transition hover:bg-white hover:text-black"><MessageCircle className="mr-2 h-5 w-5" /> Order on WhatsApp</a>
+            </div>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, scale: .95 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8 }} className="relative mx-auto flex h-[520px] w-full max-w-md items-center justify-center rounded-[3rem] border border-white/10 bg-white/[0.04] shadow-2xl shadow-white/10">
+            <div className="absolute inset-6 rounded-[2.5rem] bg-gradient-to-br from-zinc-900 via-black to-zinc-800" />
+            <div className="relative h-[420px] w-[210px] rounded-[2.4rem] border border-white/20 bg-gradient-to-br from-zinc-700 via-zinc-950 to-black p-3 shadow-2xl">
+              <div className="h-full rounded-[2rem] bg-black p-4">
+                <div className="mx-auto mb-6 h-5 w-20 rounded-full bg-zinc-800" />
+                <p className="text-xs uppercase tracking-[0.25em] text-zinc-500">Molla Shop</p>
+                <p className="mt-2 text-2xl font-semibold">iPhone 17 Pro Max</p>
+                <p className="mt-3 text-sm text-zinc-400">Europe CE · Apple Warranty</p>
+                <div className="mt-28 rounded-2xl bg-white p-3 text-center text-sm font-semibold text-black">Reserve now</div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="border-y border-white/10 bg-white/[0.03] px-5 py-6">
+        <div className="mx-auto grid max-w-7xl gap-4 text-sm text-zinc-300 md:grid-cols-4">
+          <div className="flex items-center gap-3"><ShieldCheck className="h-5 w-5" /> Original Apple Europe CE</div>
+          <div className="flex items-center gap-3"><CheckCircle2 className="h-5 w-5" /> 1 Year Warranty</div>
+          <div className="flex items-center gap-3"><MessageCircle className="h-5 w-5" /> Fast WhatsApp ordering</div>
+          <div className="flex items-center gap-3"><MapPin className="h-5 w-5" /> Store in Elbasan</div>
+        </div>
+      </section>
+
+      <section id="shop" className="mx-auto max-w-7xl px-5 py-20">
+        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-zinc-500">Shop</p>
+            <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Choose your Apple universe.</h2>
+            <p className="mt-4 max-w-2xl text-zinc-400">Product cards are built for instant WhatsApp conversion: model, storage, warranty message and stock request in one click.</p>
+          </div>
+          <div className="relative w-full md:w-80">
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-zinc-500" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search iPhone, AirPods..." className="w-full rounded-full border border-white/10 bg-white/[0.04] py-4 pl-12 pr-4 text-white outline-none placeholder:text-zinc-600 focus:border-white/30" />
+          </div>
+        </div>
+
+        <div className="mb-8 flex flex-wrap gap-3">
+          {categories.map(cat => {
+            const Icon = cat.icon;
+            return (
+              <button key={cat.name} onClick={() => setActive(cat.name)} className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${active === cat.name ? 'bg-white text-black' : 'border border-white/10 text-zinc-300 hover:bg-white/10'}`}>
+                <Icon className="h-4 w-4" /> {cat.name}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map(product => <ProductCard key={product.id} product={product} onAdd={addToCart} />)}
+        </div>
+      </section>
+
+      <section id="trust" className="bg-white px-5 py-20 text-black">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm uppercase tracking-[0.3em] text-zinc-500">Trust architecture</p>
+          <h2 className="mt-3 max-w-4xl text-4xl font-semibold md:text-6xl">From Instagram interest to confident purchase.</h2>
+          <div className="mt-12 grid gap-5 md:grid-cols-4">
+            {[
+              ['01', 'Original Apple', 'Clear claim focused on original Apple products and Europe CE devices.'],
+              ['02', 'Warranty clarity', 'Each product page highlights Apple warranty verification and support.'],
+              ['03', 'WhatsApp-first', 'Every CTA opens a pre-filled conversation with the selected product.'],
+              ['04', 'No confusion', 'No trade-in or exchange messaging unless the store explicitly offers it.']
+            ].map(item => (
+              <div key={item[0]} className="rounded-[2rem] border border-zinc-200 p-6">
+                <p className="text-sm text-zinc-500">{item[0]}</p>
+                <h3 className="mt-8 text-2xl font-semibold">{item[1]}</h3>
+                <p className="mt-3 text-zinc-600">{item[2]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-20">
+        <div className="grid gap-6 md:grid-cols-3">
+          {['New iPhone arrivals', 'Sealed packaging', 'Premium accessories'].map((title, index) => (
+            <div key={title} className="min-h-80 rounded-[2rem] border border-white/10 bg-gradient-to-br from-zinc-900 to-black p-6">
+              <p className="text-sm text-zinc-500">Instagram content block</p>
+              <h3 className="mt-40 text-2xl font-semibold">{title}</h3>
+              <p className="mt-3 text-zinc-400">Use real Instagram-style product photography here for stronger conversion.</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="visit" className="border-y border-white/10 bg-white/[0.03] px-5 py-20">
+        <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-2 md:items-center">
+          <div>
+            <p className="text-sm uppercase tracking-[0.3em] text-zinc-500">Visit</p>
+            <h2 className="mt-3 text-4xl font-semibold md:text-5xl">Reserve online. Visit the store. Buy with confidence.</h2>
+            <p className="mt-5 text-zinc-400">Designed for a customer journey that starts on Instagram, continues on WhatsApp and closes in store or by delivery.</p>
+          </div>
+          <div className="rounded-[2rem] border border-white/10 bg-black p-6">
+            <div className="space-y-5 text-zinc-300">
+              <p className="flex gap-3"><MapPin className="h-5 w-5 text-white" /> Elbasan · near Pasticeri Milano, opposite Kindergarten No. 11</p>
+              <p className="flex gap-3"><MessageCircle className="h-5 w-5 text-white" /> WhatsApp / Phone: 0692100222</p>
+              <p className="flex gap-3"><Truck className="h-5 w-5 text-white" /> Delivery and availability confirmed directly by store</p>
+            </div>
+            <a href={waLink()} className="mt-8 inline-flex w-full items-center justify-center rounded-full bg-white px-6 py-4 font-semibold text-black">Check availability</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="faq" className="mx-auto max-w-4xl px-5 py-20">
+        <p className="text-center text-sm uppercase tracking-[0.3em] text-zinc-500">FAQ</p>
+        <h2 className="mt-3 text-center text-4xl font-semibold">Before you order.</h2>
+        <div className="mt-10 space-y-4">
+          {[
+            ['Are the products original?', 'Yes. The site should clearly communicate Original Apple / Europe CE products and encourage warranty verification.'],
+            ['Can I order directly online?', 'The recommended flow is WhatsApp-first: customers select products, request stock and receive the final price before purchase.'],
+            ['Do you accept trade-in or exchange?', 'Based on the Instagram positioning, the final site should avoid exchange/trade-in claims unless the store confirms otherwise.'],
+            ['Where is the store?', 'Elbasan. The location block should include the exact address text used by the Instagram profile.']
+          ].map(([q, a]) => (
+            <div key={q} className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6">
+              <h3 className="text-lg font-semibold">{q}</h3>
+              <p className="mt-2 text-zinc-400">{a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <footer className="border-t border-white/10 px-5 py-10">
+        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-6 md:flex-row md:items-center">
+          <div>
+            <p className="text-xl font-semibold"> Molla Shop</p>
+            <p className="mt-2 text-sm text-zinc-500">Premium Apple shopping experience for Elbasan.</p>
+          </div>
+          <div className="text-sm text-zinc-500">© 2026 Molla Shop. Apple is a trademark of Apple Inc. This website must use only verified reseller claims.</div>
+        </div>
+      </footer>
+
+      {openCart && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
+          <div className="ml-auto h-full w-full max-w-md bg-zinc-950 p-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">Your bag</h2>
+              <button onClick={() => setOpenCart(false)} className="rounded-full border border-white/10 p-2"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="mt-8 space-y-4">
+              {cart.length === 0 && <p className="text-zinc-500">Your bag is empty.</p>}
+              {cart.map(item => (
+                <div key={item.id} className="rounded-2xl border border-white/10 p-4">
+                  <div className="flex justify-between gap-4">
+                    <div>
+                      <h3 className="font-semibold">{item.name}</h3>
+                      <p className="text-sm text-zinc-500">{item.storage}</p>
+                    </div>
+                    <button onClick={() => removeItem(item.id)} className="text-zinc-500 hover:text-white"><X className="h-4 w-4" /></button>
+                  </div>
+                  <div className="mt-4 flex items-center gap-3">
+                    <button onClick={() => changeQty(item.id, -1)} className="rounded-full border border-white/10 p-2"><Minus className="h-4 w-4" /></button>
+                    <span>{item.qty}</span>
+                    <button onClick={() => changeQty(item.id, 1)} className="rounded-full border border-white/10 p-2"><Plus className="h-4 w-4" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <a href={`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(cartMessage)}`} className="mt-8 flex w-full items-center justify-center rounded-full bg-white px-6 py-4 font-semibold text-black">Checkout via WhatsApp</a>
+          </div>
+        </div>
+      )}
+    </div>
