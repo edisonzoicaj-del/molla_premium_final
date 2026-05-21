@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Molla Shop — Premium Apple Store Albania</title>
+<meta name="description" content="Premium Apple store in Albania. iPhone, MacBook, Apple Watch, AirPods, accessories, trade-in, showroom pickup and WhatsApp checkout." />
+<meta name="theme-color" content="#000000" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        apple: "#0071e3",
+        ink: "#050505",
+        soft: "#f5f5f7"
+      }
+    }
+  }
+}
+</script>
+
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+.glass{backdrop-filter:blur(22px);background:rgba(255,255,255,.78)}
+.card{transition:.35s cubic-bezier(.2,.8,.2,1)}
+.card:hover{transform:translateY(-6px)}
+.modal{transform:translateX(100%);transition:.3s}
+.modal.open{transform:translateX(0)}
+</style>
+</head>
+
+<body class="bg-white text-ink">
+
+<header class="fixed top-0 inset-x-0 z-40 glass border-b border-black/5">
+  <nav class="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between">
+    <a href="#" class="text-xl font-semibold"> Molla Shop</a>
+    <div class="hidden md:flex gap-7 text-sm">
+      <a href="#shop">Shop</a>
+      <a href="#categories">Categories</a>
+      <a href="#tradein">Trade-In</a>
+      <a href="#showroom">Showroom</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <button onclick="toggleCart()" class="bg-black text-white px-5 py-2 rounded-full text-sm">
+      Bag <span id="bagCount">0</span>
+    </button>
+  </nav>
+</header>
+
+<aside id="cart" class="modal fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col">
+  <div class="p-6 border-b flex justify-between">
+    <h2 class="text-xl font-semibold">Your Bag</h2>
+    <button onclick="toggleCart()">✕</button>
+  </div>
+  <div id="cartItems" class="flex-1 p-6 space-y-4 overflow-y-auto"></div>
+  <div class="p-6 border-t bg-soft">
+    <div class="flex justify-between font-semibold text-lg mb-4">
+      <span>Total</span><span id="cartTotal">0 LEK</span>
+    </div>
+    <button onclick="checkout()" class="w-full bg-apple text-white py-4 rounded-full font-medium">
+      Checkout via WhatsApp
+    </button>
+  </div>
+</aside>
+
+<section class="min-h-screen pt-28 bg-[radial-gradient(circle_at_top,#1d4ed8_0%,#050505_42%,#000_100%)] text-white flex items-center">
+  <div class="max-w-7xl mx-auto px-5 grid lg:grid-cols-2 gap-14 items-center">
+    <div>
+      <p class="text-blue-300 mb-4 font-medium">Premium Apple Experience Albania</p>
+      <h1 class="text-5xl md:text-7xl font-semibold tracking-tight leading-[.95] mb-7">
+        Apple, delivered premium.
+      </h1>
+      <p class="text-xl text-white/65 max-w-xl mb-9">
+        Original iPhone, MacBook, Apple Watch and AirPods with warranty, showroom pickup in Tirana and fast WhatsApp support.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4">
+        <a href="#shop" class="bg-white text-black px-8 py-4 rounded-full text-center font-medium">Shop Products</a>
+        <a href="https://wa.me/355682048887" class="border border-white/25 px-8 py-4 rounded-full text-center font-medium">WhatsApp Concierge</a>
+      </div>
+    </div>
+    <div class="rounded-[3rem] bg-white/10 border border-white/10 p-8">
+      <div class="aspect-square rounded-[2.4rem] bg-gradient-to-br from-white to-slate-500 text-black flex items-center justify-center">
+        <div class="text-center">
+          <div class="text-8xl mb-5"></div>
+          <p class="text-2xl font-semibold">iPhone · Mac · Watch · AirPods</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="categories" class="py-20 bg-soft">
+  <div class="max-w-7xl mx-auto px-5">
+    <h2 class="text-4xl font-semibold mb-10">Shop by Category</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+      <button onclick="filterProducts('all')" class="cat bg-black text-white p-6 rounded-3xl">All</button>
+      <button onclick="filterProducts('iphone')" class="cat bg-white p-6 rounded-3xl">iPhone</button>
+      <button onclick="filterProducts('mac')" class="cat bg-white p-6 rounded-3xl">Mac</button>
+      <button onclick="filterProducts('watch')" class="cat bg-white p-6 rounded-3xl">Watch</button>
+      <button onclick="filterProducts('airpods')" class="cat bg-white p-6 rounded-3xl">AirPods</button>
+    </div>
+  </div>
+</section>
+
+<section id="shop" class="py-24">
+  <div class="max-w-7xl mx-auto px-5">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+      <div>
+        <p class="text-apple font-medium mb-2">Ecommerce</p>
+        <h2 class="text-4xl md:text-5xl font-semibold tracking-tight">Featured Products</h2>
+      </div>
+      <p class="text-gray-500 mt-4">Availability confirmed via WhatsApp.</p>
+    </div>
+    <div id="products" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+  </div>
+</section>
+
+<section class="py-20 bg-black text-white">
+  <div class="max-w-7xl mx-auto px-5 grid md:grid-cols-4 gap-6 text-center">
+    <div class="p-8 rounded-3xl bg-white/10"><h3 class="text-xl font-semibold">Original</h3><p class="text-white/50 mt-2">Sealed Apple devices</p></div>
+    <div class="p-8 rounded-3xl bg-white/10"><h3 class="text-xl font-semibold">Warranty</h3><p class="text-white/50 mt-2">Official coverage</p></div>
+    <div class="p-8 rounded-3xl bg-white/10"><h3 class="text-xl font-semibold">Pickup</h3><p class="text-white/50 mt-2">Showroom in Tirana</p></div>
+    <div class="p-8 rounded-3xl bg-white/10"><h3 class="text-xl font-semibold">Delivery</h3><p class="text-white/50 mt-2">Fast nationwide</p></div>
+  </div>
+</section>
+
+<section id="tradein" class="py-24 bg-soft">
+  <div class="max-w-7xl mx-auto px-5 grid lg:grid-cols-2 gap-12 items-center">
+    <div>
+      <p class="text-apple font-medium mb-3">Trade-In</p>
+      <h2 class="text-4xl md:text-5xl font-semibold tracking-tight mb-6">Upgrade easier.</h2>
+      <p class="text-gray-500 text-lg mb-8">Bring your used iPhone, MacBook or Apple Watch and receive credit toward a new Apple device.</p>
+      <a href="https://wa.me/355682048887?text=I%20want%20a%20trade-in%20evaluation" class="inline-block bg-black text-white px-8 py-4 rounded-full font-medium">Get Evaluation</a>
+    </div>
+    <div class="bg-white rounded-[2rem] p-8 shadow-sm">
+      <ul class="space-y-5 text-gray-700">
+        <li>✓ Instant quote</li>
+        <li>✓ Secure reset guidance</li>
+        <li>✓ Credit for new device</li>
+        <li>✓ In-store evaluation</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="showroom" class="py-24">
+  <div class="max-w-7xl mx-auto px-5">
+    <h2 class="text-4xl md:text-5xl font-semibold tracking-tight mb-12">Visit our showroom</h2>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="bg-soft rounded-3xl p-8">
+        <h3 class="text-2xl font-semibold mb-2">Sky Tower, Tirana</h3>
+        <p class="text-gray-500 mb-6">Premium Apple Experience Center</p>
+        <a class="text-apple font-medium" href="https://wa.me/355682048887?text=Book%20Sky%20Tower%20visit">Book Visit →</a>
+      </div>
+      <div class="bg-soft rounded-3xl p-8">
+        <h3 class="text-2xl font-semibold mb-2">Toptani Shopping Center</h3>
+        <p class="text-gray-500 mb-6">Ground floor, Tirana</p>
+        <a class="text-apple font-medium" href="https://wa.me/355682048887?text=Book%20Toptani%20visit">Book Visit →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" class="py-24 bg-soft">
+  <div class="max-w-3xl mx-auto px-5">
+    <h2 class="text-4xl font-semibold text-center mb-10">FAQ</h2>
+    <div class="space-y-4">
+      <details class="p-6 rounded-2xl bg-white"><summary class="font-medium cursor-pointer">Are the products original?</summary><p class="text-gray-500 mt-3">Yes, devices are original, sealed and covered by warranty.</p></details>
+      <details class="p-6 rounded-2xl bg-white"><summary class="font-medium cursor-pointer">Do you deliver outside Tirana?</summary><p class="text-gray-500 mt-3">Yes, nationwide delivery is available by courier.</p></details>
+      <details class="p-6 rounded-2xl bg-white"><summary class="font-medium cursor-pointer">Can I pay in installments?</summary><p class="text-gray-500 mt-3">Installment options can be checked via WhatsApp.</p></details>
+      <details class="p-6 rounded-2xl bg-white"><summary class="font-medium cursor-pointer">Do you accept trade-in?</summary><p class="text-gray-500 mt-3">Yes, in-store evaluation is available for selected Apple devices.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer class="bg-black text-white py-14">
+  <div class="max-w-7xl mx-auto px-5 grid md:grid-cols-4 gap-10">
+    <div>
+      <h3 class="text-xl font-semibold mb-3">Molla Shop</h3>
+      <p class="text-white/50">Premium Apple devices in Albania.</p>
+    </div>
+    <div><h4 class="font-medium mb-3">Products</h4><p class="text-white/50">iPhone<br>MacBook<br>AirPods<br>Apple Watch</p></div>
+    <div><h4 class="font-medium mb-3">Contact</h4><p class="text-white/50">+355 68 204 8887<br>Sky Tower & Toptani</p></div>
+    <div><h4 class="font-medium mb-3">WhatsApp</h4><a href="https://wa.me/355682048887" class="text-apple">Message now →</a></div>
+  </div>
+  <p class="text-center text-white/35 text-sm mt-12">© 2026 Molla Shop. Not affiliated with Apple Inc.</p>
+</footer>
+
+<script>
+const products = [
+  {name:"iPhone 16 Pro Max",cat:"iphone",price:145000,icon:"📱"},
+  {name:"iPhone 16 Pro",cat:"iphone",price:125000,icon:"📱"},
+  {name:"iPhone 15",cat:"iphone",price:95000,icon:"📱"},
+  {name:"MacBook Air M4",cat:"mac",price:135000,icon:"💻"},
+  {name:"MacBook Pro M4",cat:"mac",price:195000,icon:"💻"},
+  {name:"Apple Watch Ultra 2",cat:"watch",price:85000,icon:"⌚"},
+  {name:"Apple Watch Series 10",cat:"watch",price:55000,icon:"⌚"},
+  {name:"AirPods Pro 2 USB-C",cat:"airpods",price:32000,icon:"🎧"},
+  {name:"AirPods 4 ANC",cat:"airpods",price:22000,icon:"🎧"},
+  {name:"MagSafe Charger",cat:"accessories",price:6500,icon:"🔌"},
+  {name:"20W USB-C Adapter",cat:"accessories",price:4500,icon:"🔋"},
+  {name:"iPhone Case",cat:"accessories",price:8500,icon:"🧩"}
+];
+
+let cart = JSON.parse(localStorage.getItem("mollaCart") || "[]");
+let current = "all";
+
+function render(){
+  const box=document.getElementById("products");
+  const list=current==="all"?products:products.filter(p=>p.cat===current);
+  box.innerHTML=list.map((p,i)=>`
+    <div class="card bg-soft rounded-3xl p-6">
+      <div class="h-52 rounded-2xl bg-white flex items-center justify-center text-6xl">${p.icon}</div>
+      <p class="text-xs uppercase tracking-wider text-gray-400 mt-6">${p.cat}</p>
+      <h3 class="text-xl font-semibold mt-1">${p.name}</h3>
+      <p class="text-apple font-semibold mt-2">${p.price.toLocaleString()} LEK</p>
+      <div class="grid grid-cols-2 gap-3 mt-5">
+        <button onclick="addToCart(${i}, '${current}')" class="bg-black text-white py-3 rounded-full text-sm">Add</button>
+        <a href="https://wa.me/355682048887?text=I%20am%20interested%20in%20${encodeURIComponent(p.name)}" class="border border-black/10 py-3 rounded-full text-sm text-center">Ask</a>
+      </div>
+    </div>
+  `).join("");
+}
+
+function filterProducts(cat){
+  current=cat;
+  render();
+}
+
+function addToCart(index){
+  const list=current==="all"?products:products.filter(p=>p.cat===current);
+  const p=list[index];
+  const found=cart.find(x=>x.name===p.name);
+  if(found) found.qty++;
+  else cart.push({...p,qty:1});
+  save();
+  updateCart();
+}
+
+function save(){
+  localStorage.setItem("mollaCart",JSON.stringify(cart));
+}
+
+function updateCart(){
+  document.getElementById("bagCount").textContent=cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById("cartTotal").textContent=cart.reduce((s,i)=>s+i.price*i.qty,0).toLocaleString()+" LEK";
+  document.getElementById("cartItems").innerHTML=cart.length?cart.map((i,idx)=>`
+    <div class="flex justify-between gap-4 bg-soft p-4 rounded-2xl">
+      <div>
+        <h4 class="font-medium">${i.icon} ${i.name}</h4>
+        <p class="text-sm text-gray-500">${i.price.toLocaleString()} LEK × ${i.qty}</p>
+      </div>
+      <button onclick="removeItem(${idx})">✕</button>
+    </div>
+  `).join(""):`<p class="text-gray-500">Your bag is empty.</p>`;
+}
+
+function removeItem(i){
+  cart.splice(i,1);
+  save();
+  updateCart();
+}
+
+function toggleCart(){
+  document.getElementById("cart").classList.toggle("open");
+}
+
+function checkout(){
+  if(!cart.length)return alert("Your bag is empty");
+  const items=cart.map(i=>`• ${i.name} x${i.qty} = ${(i.price*i.qty).toLocaleString()} LEK`).join("%0A");
+  const total=cart.reduce((s,i)=>s+i.price*i.qty,0).toLocaleString();
+  window.open(`https://wa.me/355682048887?text=Hello%20Molla%20Shop,%0AI%20want%20to%20order:%0A${items}%0A%0ATotal:%20${total}%20LEK`,"_blank");
+}
+
+render();
+updateCart();
+</script>
+
+</body>
+</html>
